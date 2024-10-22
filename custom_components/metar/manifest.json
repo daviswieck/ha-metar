@@ -1,5 +1,5 @@
 {
-  "domain": "metar_sensor",
+  "domain": "metar",
   "name": "METAR Sensor",
   "version": "1.0.0",
   "documentation": "https://github.com/daviswieck/ha-metar",
