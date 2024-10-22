@@ -1,0 +1,10 @@
+{
+  "domain": "metar_sensor",
+  "name": "METAR Sensor",
+  "version": "1.0.0",
+  "documentation": "https://github.com/daviswieck/ha-metar",
+  "requirements": ["python-metar"],
+  "dependencies": [],
+  "config_flow": true,
+  "codeowners": ["@daviswieck"]
+}
