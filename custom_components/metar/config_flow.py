@@ -3,7 +3,7 @@ from homeassistant import config_entries
 from homeassistant.core import callback
 from .const import DEFAULT_UPDATE_INTERVAL
 
-class MetarSensorConfigFlow(config_entries.ConfigFlow, domain="metar_sensor"):
+class MetarSensorConfigFlow(config_entries.ConfigFlow, domain="metar"):
     """Config flow for METAR sensor."""
 
     async def async_step_user(self, user_input=None):
