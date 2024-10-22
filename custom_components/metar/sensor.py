@@ -56,9 +56,10 @@ class MetarSensor(SensorEntity):
                         "pressure": f"{report.press.value('MB')} mb" if report.press else "N/A",
                         "sky": self._format_sky_conditions(report.sky),
                         "remarks": " ".join(report.remarks()) if report.remarks() else "None",
-                        "raw_metar": report.code,
+                        "raw_metar": report.code,  # Storing the raw METAR string
                     }
-                    self._state = report.temp.value('C') if report.temp else "N/A"
+                    # Change main sensor state to visibility
+                    self._state = report.vis.value('SM') if report.vis else "N/A"
             except Exception as e:
                 self._state = f"Error: {e}"
                 self._attributes = {"error": str(e)}
@@ -87,7 +88,6 @@ class MetarSensor(SensorEntity):
     
         return ", ".join(formatted_layers)
 
-
     @property
     def state(self):
         """Return the state of the sensor."""
@@ -95,9 +95,27 @@ class MetarSensor(SensorEntity):
 
     @property
     def extra_state_attributes(self):
-        """Return extra attributes."""
-        return {**self._attributes, ATTR_ATTRIBUTION: ATTRIBUTION}
+        """Return the state attributes."""
+        temperature = self._attributes.get("temperature")
+        dew_point = self._attributes.get("dew_point")
 
+        return {
+            "station": self._attributes.get("station"),
+            "report_type": self._attributes.get("report_type"),
+            "time": self._attributes.get("time"),
+            "temperature_c": temperature.replace(" °C", "") if temperature and " °C" in temperature else "N/A",  # Celsius
+            "temperature_f": (float(temperature.replace(" °C", "")) * 9 / 5 + 32) if temperature and " °C" in temperature else "N/A",  # Fahrenheit
+            "dew_point_c": dew_point.replace(" °C", "") if dew_point and " °C" in dew_point else "N/A",  # Dew point in Celsius
+            "dew_point_f": (float(dew_point.replace(" °C", "")) * 9 / 5 + 32) if dew_point and " °C" in dew_point else "N/A",  # Dew point in Fahrenheit
+            "wind": self._attributes.get("wind"),
+            "visibility": self._attributes.get("visibility"),
+            "pressure_mb": self._attributes.get("pressure"),
+            "pressure_inhg": f"{(float(self._attributes.get('pressure').replace(' mb', '')) * 0.02953):.2f} inHg" if self._attributes.get("pressure") and " mb" in self._attributes.get("pressure") else "N/A",  # Pressure in inches of mercury
+            "sky": self._attributes.get("sky"),
+            "remarks": self._attributes.get("remarks"),
+            "raw_metar": self._attributes.get("raw_metar"),  # Include the raw METAR string
+        }
+        
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up the METAR sensor platform."""
     station_code = entry.data["station_code"]
